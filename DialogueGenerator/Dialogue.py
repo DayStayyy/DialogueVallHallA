@@ -1,7 +1,7 @@
 import re
 from Character import Character
 from Result import Result
-
+from utils import splitterCommaNotInQuote
 
 class Dialogue :
     """
@@ -37,8 +37,7 @@ class Dialogue :
 
 
     def __init__(self, script):
-        print(script)
-        self.script = [re.split(r',(?=")', line) for line in script.split('\n')]
+        self.script = [splitterCommaNotInQuote(line) for line in script.split('\n')]
         self.getScriptParemeters()
         self.line_index = 1
 
@@ -75,7 +74,6 @@ class Dialogue :
     def getScriptParemeters(self):
         
         for parameters in self.script[0][0].split(',') :
-            print(parameters)
             if parameters == '' : continue
             elif parameters.startswith('MainImage'):
                 splitParameters = parameters.split(':')
@@ -86,10 +84,8 @@ class Dialogue :
                 if len(splitParameters) != 2 : continue
                 self.defaultTimeToDisplay = float(splitParameters[1])
             elif parameters.startswith('BackgroundImage'):
-                print('ya')
                 splitParameters = parameters.split(':')
                 if len(splitParameters) != 2 : continue
-                print('yY')
                 self.backgroundImage = splitParameters[1]
             elif parameters.startswith('VariationCoordinates'):
                 splitParameters = parameters.split(':')
