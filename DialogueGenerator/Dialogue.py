@@ -11,6 +11,7 @@ class Dialogue :
     - MainImage:NameOfCharacter:NameOfMainImage
     - DefaultTimeToDisplay:Time
     - BackgroundImage:NameOfBackgroundImage
+    - CharacterPresentAtTheStart:CharacterName1:CharacterName2:CharacterName3
 
     "CharacterName,Text and optional parameters"
     - The CharacterName is the name of the character
@@ -31,14 +32,15 @@ class Dialogue :
     - The fourth element is the time to display the text
     """
 
-    characters = {}
-    defaultTimeToDisplay = 0.5
-
 
     def __init__(self, script):
+        self.line_index = 1
+        self.characters = {}
+        self.defaultTimeToDisplay = 0.5
+        self.charactersPresent = []
         self.script = [splitterCommaNotInQuote(line) for line in script.split('\n')]
         self.getScriptParemeters()
-        self.line_index = 1
+
 
     def __iter__(self):
         return self
@@ -51,7 +53,6 @@ class Dialogue :
         CharacterName, Text, *optionalParameters = line
         Text = Text[1:-1] # remove quotes
         if CharacterName not in self.characters:
-            print(f'Character {CharacterName} does not exist')
             self.characters[CharacterName] = Character(CharacterName)
         mainImageName = self.characters[CharacterName].principaleImageName
         bodyPartVariante = {}
@@ -73,7 +74,7 @@ class Dialogue :
 
     def getScriptParemeters(self):
         
-        for parameters in self.script[0][0].split(',') :
+        for parameters in self.script[0] :
             if parameters == '' : continue
             elif parameters.startswith('MainImage'):
                 splitParameters = parameters.split(':')
@@ -87,4 +88,11 @@ class Dialogue :
                 splitParameters = parameters.split(':')
                 if len(splitParameters) != 2 : continue
                 self.backgroundImage = splitParameters[1]
+            elif parameters.startswith('CharacterPresentAtTheStart'):
+                print(parameters.split(':'))
+                for characterName in parameters.split(':')[1:]:
+                    if characterName not in self.characters:
+                        self.characters[characterName] = Character(characterName)
+                    self.charactersPresent.append(self.characters[characterName])
+                    
 

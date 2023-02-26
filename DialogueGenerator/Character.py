@@ -1,3 +1,4 @@
+import copy
 from PIL import Image, ImageDraw
 import os
 from Variation import Variation
@@ -10,7 +11,6 @@ class Character :
     def __init__(self, name, firstMainImageName = None):
         self.mainImages = {}
         self.bodyPartVariantesImages = {}
-        self.imageConsructor = None
         self.principaleImageName = None
         self.name = name
         self.path_assets = os.path.join(self.path_assets, f'{name}')
@@ -20,6 +20,7 @@ class Character :
         else :
             self.addMainImage('main')
             self.principaleImageName = 'main'
+        self.actualImage = self.mainImages[self.principaleImageName]
         self.getAllVariations()
 
     def getAllVariations(self):
@@ -33,8 +34,7 @@ class Character :
             try : 
                 self.mainImages[image_name] = Image.open(os.path.join(self.path_assets, f'{image_name}.png'))
             except FileNotFoundError:
-                self.mainImages[image_name] = None
-        return self.mainImages[image_name]
+                raise Exception(f'Image {image_name} does not exist')
     
     def addBodyPartVariantes(self, variantesName, pathToAssets, x, y):
         if variantesName not in self.bodyPartVariantesImages:
@@ -49,15 +49,14 @@ class Character :
         
     def createCharacterImage(self, mainImageName, bodyPartVariantes):
         if mainImageName in self.mainImages:
-            img = self.mainImages[mainImageName]
+            img = copy.copy(self.mainImages[mainImageName])
             I1 = ImageDraw.Draw(img)
-            print(bodyPartVariantes)
             for bodyPart, variation in bodyPartVariantes.items():
                 if bodyPart in self.bodyPartVariantesImages:
-                    print(variation)
                     if variation not in self.bodyPartVariantesImages[bodyPart].VariationsImages:
                         self.addVariation(bodyPart, variation)
                     img.paste(self.bodyPartVariantesImages[bodyPart].VariationsImages[variation], (self.bodyPartVariantesImages[bodyPart].x, self.bodyPartVariantesImages[bodyPart].y), self.bodyPartVariantesImages[bodyPart].VariationsImages[variation])
+            self.actualImage = img
             return img
         else:
             raise Exception(f'Main image {mainImageName} does not exist')

@@ -1,4 +1,4 @@
-BackgroundImage:Background_Screen,DefaultTimeToDisplay:5,MainImage:Gillian:main,MainImage:Jill:main
+BackgroundImage:Background_Screen,DefaultTimeToDisplay:5,MainImage:Gillian:main,MainImage:Jill:main,CharacterPresentAtTheStart:Gillian:Jill
 Gillian,"Bonjour, je m'appelle Gillian et vous ?",time:8
 Jill,"Bonjour, Gillian, je m'appelle Jill."
 Gillian,"Enchanté de faire votre connaissance Jill.",variation:mouth:Open

@@ -18,9 +18,10 @@ class DialogueCreator:
     xFont = 100
     yFont = 230
     font = ImageFont.truetype('Fonts/va-11-hall-a-6px-non-mono.ttf')
-    indexOfImage = 0
+
 
     def __init__(self, dialogueName, JSONName):
+        self.indexOfImage = 0
         with open(os.path.join(self.DIALOGUES_PATH, dialogueName), 'r', encoding='utf-8') as f:
             script = f.read()
     
@@ -30,7 +31,7 @@ class DialogueCreator:
 
         with open(os.path.join(self.PATH_TO_JSON, JSONName), 'r', encoding='utf-8') as f:
             self.data = json.load(f)
-    
+
 
     def writeLetterByLetter(self,text, x, y, pathFont, timeToDisplay, background, sizeFont=None):
         timeToDisplay = timeToDisplay/len(text)
@@ -58,14 +59,18 @@ class DialogueCreator:
 
     def createVideo(self):
         for ligne in self.dialogueIterator :
-            background = copy.copy(self.background)
+            background = self.UpdateBackgroundWithCharacters(copy.copy(self.background))
             pastImage(ligne.image, background, self.data["Characters"][ligne.characterName]["x"], self.data["Characters"][ligne.characterName]["y"], self.data["Characters"][ligne.characterName]["resize"])
             self.writeLetterByLetter(ligne.text, self.xFont, self.yFont, 'Fonts/va-11-hall-a-6px-non-mono.ttf', ligne.timeToDisplay, background)
             # use imagesToVideo to create a vide
         self.imagesToVideo('Results/*.png', 'Results/Video.mp4', 10)
 
-
-
+    def UpdateBackgroundWithCharacters(self, background):
+        print(self.dialogueObject.charactersPresent)
+        for character in self.dialogueObject.charactersPresent :
+            pastImage(character.actualImage, background, self.data["Characters"][character.name]["x"], self.data["Characters"][character.name]["y"], self.data["Characters"][character.name]["resize"])
+        return background
+    
 if __name__ == '__main__':
     dialogueCreator = DialogueCreator('test.csv', 'FirstBackground.json')
     dialogueCreator.createVideo()
