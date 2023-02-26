@@ -5,3 +5,5 @@ class Result :
         self.image = image
         self.timeToDisplay = timeToDisplay
     
+    def __str__(self):
+        return f"CharacterName: {self.characterName} \nText: {self.text} \nTimeToDisplay: {self.timeToDisplay}"

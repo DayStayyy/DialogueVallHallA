@@ -1,0 +1,14 @@
+{
+    "Characters": {
+        "Gillian": {
+            "x": 95,
+            "y": 80,
+            "resize": -2.2
+        },
+        "Jill": {
+            "x": 480,
+            "y": 93,
+            "resize": -2.2
+        }
+    }
+}

@@ -1,5 +1,6 @@
 import copy
 import glob
+import json
 import os
 import time
 
@@ -7,38 +8,36 @@ import numpy as np
 from Dialogue import Dialogue
 from PIL import Image, ImageDraw, ImageFont
 import cv2
+from ImagesGenerator import write_text, pastImage
 
 class DialogueCreator:
     DIALOGUES_PATH = './Dialogues'
     ASSETS_PATH = './Assets'
+    PATH_TO_JSON = './Data'
 
     xFont = 100
     yFont = 230
     font = ImageFont.truetype('Fonts/va-11-hall-a-6px-non-mono.ttf')
     indexOfImage = 0
 
-    def __init__(self, dialogueName):
+    def __init__(self, dialogueName, JSONName):
         with open(os.path.join(self.DIALOGUES_PATH, dialogueName), 'r', encoding='utf-8') as f:
             script = f.read()
-
+    
         self.dialogueObject = Dialogue(script)
         self.dialogueIterator = iter(self.dialogueObject)
         self.background = Image.open(os.path.join(self.ASSETS_PATH,self.dialogueObject.backgroundImage+'.png'))
 
-    def write_text(self,text, x, y, pathFont, background, sizeFont=None):
-        if sizeFont : 
-            font = ImageFont.truetype(pathFont, sizeFont)
-        else:
-            font = ImageFont.truetype(pathFont)
-        imageToModify = ImageDraw.Draw(background)
-        imageToModify.text((x, y), text, font=font)
+        with open(os.path.join(self.PATH_TO_JSON, JSONName), 'r', encoding='utf-8') as f:
+            self.data = json.load(f)
+    
 
     def writeLetterByLetter(self,text, x, y, pathFont, timeToDisplay, background, sizeFont=None):
         timeToDisplay = timeToDisplay/len(text)
         background.save(f'Results/{self.indexOfImage}.png')
         self.indexOfImage += 1
         for letter in text:
-            self.write_text(letter, x, y, pathFont, background, sizeFont)
+            write_text(letter, x, y, pathFont, background, sizeFont)
             x += 5
             background.save(f'Results/{self.indexOfImage}.png')
             self.indexOfImage += 1
@@ -59,11 +58,28 @@ class DialogueCreator:
 
     def createVideo(self):
         for ligne in self.dialogueIterator :
-            self.writeLetterByLetter(ligne.text, self.xFont, self.yFont, 'Fonts/va-11-hall-a-6px-non-mono.ttf', ligne.timeToDisplay, copy.copy(self.background))
+            background = copy.copy(self.background)
+            pastImage(ligne.image, background, self.data["Characters"][ligne.characterName]["x"], self.data["Characters"][ligne.characterName]["y"], self.data["Characters"][ligne.characterName]["resize"])
+            self.writeLetterByLetter(ligne.text, self.xFont, self.yFont, 'Fonts/va-11-hall-a-6px-non-mono.ttf', ligne.timeToDisplay, background)
             # use imagesToVideo to create a vide
         self.imagesToVideo('Results/*.png', 'Results/Video.mp4', 10)
 
 
+
 if __name__ == '__main__':
-    dialogueCreator = DialogueCreator('test.csv')
+    dialogueCreator = DialogueCreator('test.csv', 'FirstBackground.json')
     dialogueCreator.createVideo()
+
+    # first = dialogueCreator.dialogueIterator.__next__()
+    # resize = 1/-(-2.2)
+    # reduce = first.image.resize((int(first.image.width*resize), int(first.image.height*resize)))
+    # dialogueCreator.background.paste(reduce, (95, 80), reduce)
+    # # dialogueCreator.background.paste(reduce, (480, 80), reduce)
+
+
+    # second = dialogueCreator.dialogueIterator.__next__()
+    # print(second)
+    # reduce = second.image.resize((int(second.image.width/2.2), int(second.image.height/2.2)))
+    # dialogueCreator.background.paste(reduce, (480, 93), reduce)
+    # dialogueCreator.background.show()
+

@@ -11,7 +11,6 @@ class Dialogue :
     - MainImage:NameOfCharacter:NameOfMainImage
     - DefaultTimeToDisplay:Time
     - BackgroundImage:NameOfBackgroundImage
-    - VariationCoordinates:NameOfCharacter:NameOfBodyPart:Coordinates:path -> Coordinates format is "x,y", quotes are important, path is optional
 
     "CharacterName,Text and optional parameters"
     - The CharacterName is the name of the character
@@ -52,6 +51,7 @@ class Dialogue :
         CharacterName, Text, *optionalParameters = line
         Text = Text[1:-1] # remove quotes
         if CharacterName not in self.characters:
+            print(f'Character {CharacterName} does not exist')
             self.characters[CharacterName] = Character(CharacterName)
         mainImageName = self.characters[CharacterName].principaleImageName
         bodyPartVariante = {}
@@ -87,13 +87,4 @@ class Dialogue :
                 splitParameters = parameters.split(':')
                 if len(splitParameters) != 2 : continue
                 self.backgroundImage = splitParameters[1]
-            elif parameters.startswith('VariationCoordinates'):
-                splitParameters = parameters.split(':')
-                if len(splitParameters) >= 4 and len(splitParameters) <= 5: continue
-                if splitParameters[1] not in self.characters:
-                    self.characters[splitParameters[1]] = Character(splitParameters[1])
-                path = None
-                if len(splitParameters) == 5:
-                    path = splitParameters[4]
-                x, y = splitParameters[3].split(',')
-                self.characters[splitParameters[1]].addBodyPartVariantes(splitParameters[2], x, y, path)
+
